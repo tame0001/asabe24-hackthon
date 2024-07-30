@@ -1,7 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, AfterViewInit } from '@angular/core';
-import * as L from 'leaflet';
-import { FeatureCollection, Point } from 'geojson';
+import {
+  Map,
+  geoJson,
+  map,
+  tileLayer,
+  LatLngExpression,
+  LeafletMouseEvent,
+} from 'leaflet';
+import { FeatureCollection } from 'geojson';
 
 @Component({
   selector: 'app-map',
@@ -11,54 +18,68 @@ import { FeatureCollection, Point } from 'geojson';
   styleUrl: './map.component.scss',
 })
 export class MapComponent implements OnInit, AfterViewInit {
-  private map!: L.Map;
-
+  private map!: Map;
   constructor(private _http: HttpClient) {}
 
   ngOnInit() {
     this._http
       .get<FeatureCollection>('http://localhost:8000/shape')
       .subscribe((data) => {
-        let shape = L.geoJson(data.features, {
-          style: (feature) => ({ color: feature?.properties.color }),
-          // onEachFeature(feature, layer) {
-          //   let properties = feature.properties;
-          //   // console.log(properties.fid);
-          //   return layer.bindPopup(properties.fid);
-          // },
+        let shape = geoJson(data.features, {
+          style: (feature) => {
+            return {
+              color: feature?.properties.color,
+              weight: 3,
+              opacity: 0.5,
+              fillOpacity: 0.3,
+            };
+          },
+          onEachFeature: (feature, layer) => {
+            let properties = feature.properties;
+            layer.bindTooltip(`${properties.fid}`);
+            layer.on({
+              mouseover: (event: LeafletMouseEvent) =>
+                this.highlightFeature(event),
+              mouseout: (event: LeafletMouseEvent) => this.resetFeature(event),
+              click: (event: LeafletMouseEvent) => {
+                console.log(properties.color);
+              },
+            });
+          },
         }).addTo(this.map);
         this.map.fitBounds(shape.getBounds());
+        let center: LatLngExpression = [40.5, -86.9];
+        this.map.setView(center, 12);
       });
   }
 
   ngAfterViewInit() {
     this.initializeMap();
-    this.initShape();
-  }
-
-  private initShape() {
-    // let feature = L.geoJSON(this.shape, {
-    //   onEachFeature(feature, layer) {
-    //     // console.log(feature.properties);
-    //     return layer.bindPopup(feature.properties.NAME);
-    //   },
-    //   style: function filterColor(feature) {
-    //     switch (feature.properties.NAME) {
-    //       default:
-    //         return {
-    //           color: 'red',
-    //           weight: 1,
-    //           opacity: 0.65,
-    //         };
-    //     }
-    //   }.bind(this),
-    // }).addTo(map);
-    // L.geoJson(this.shape).addTo(this.map);
   }
 
   private initializeMap() {
     const baseMapURl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-    this.map = L.map('map');
-    L.tileLayer(baseMapURl).addTo(this.map);
+    this.map = map('map');
+    tileLayer(baseMapURl).addTo(this.map);
+  }
+
+  private highlightFeature(event: LeafletMouseEvent) {
+    let layer = event.target;
+
+    layer.setStyle({
+      weight: 10,
+      opacity: 1.0,
+      fillOpacity: 0.8,
+    });
+  }
+
+  private resetFeature(event: LeafletMouseEvent) {
+    let layer = event.target;
+
+    layer.setStyle({
+      weight: 3,
+      opacity: 0.5,
+      fillOpacity: 0.3,
+    });
   }
 }
