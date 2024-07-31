@@ -1,3 +1,10 @@
 {
-  "cSpell.words": ["echarts", "fastapi", "tailwindcss", "timeseries"]
+  "cSpell.words": [
+    "echarts",
+    "fastapi",
+    "geogroup",
+    "tailwindcss",
+    "timeseries",
+    "tqdm"
+  ]
 }

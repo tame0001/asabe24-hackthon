@@ -34,7 +34,6 @@ export class TimeseriesComponent {
   }
 
   ngOnChanges() {
-    console.log(this.block);
     if (this.block !== undefined) {
       this._http
         .get<LogInterface[]>(
