@@ -1,4 +1,3 @@
-<div></div>
 <div class="container flex flex-col flex-wrap space-y-2">
   <div class="basis-8/12">
     <div id="map"></div>
@@ -9,6 +8,7 @@
     <mat-radio-group
       aria-labelledby="example-radio-group-label"
       class="example-radio-group"
+      [(ngModel)]="selectMatrix"
     >
       @for (matrix of matrices; track matrix) {
       <mat-radio-button
@@ -19,5 +19,11 @@
       >
       }
     </mat-radio-group>
+  </div>
+  <div>
+    <app-timeseries
+      [matrix]="selectMatrix"
+      [block]="selectBlock"
+    ></app-timeseries>
   </div>
 </div>

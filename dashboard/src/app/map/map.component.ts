@@ -14,11 +14,12 @@ import { FeatureCollection } from 'geojson';
 import { Observable, of } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { MatRadioModule } from '@angular/material/radio';
+import { TimeseriesComponent } from '../timeseries/timeseries.component';
 
 @Component({
   selector: 'app-map',
   standalone: true,
-  imports: [FormsModule, MatRadioModule],
+  imports: [FormsModule, MatRadioModule, TimeseriesComponent],
   templateUrl: './map.component.html',
   styleUrl: './map.component.scss',
 })
@@ -26,7 +27,9 @@ export class MapComponent implements OnInit, AfterViewInit {
   private map!: Map;
   private shape!: GeoJSON;
   private shapeData!: FeatureCollection;
-  matrices: string[] = ['Weight', 'CO2', 'Methane', 'Contribution'];
+  public matrices: string[] = ['Weight', 'CO2', 'Methane', 'Contribution'];
+  public selectMatrix?: string;
+  public selectBlock?: number;
 
   constructor(private _http: HttpClient) {}
 
@@ -47,13 +50,13 @@ export class MapComponent implements OnInit, AfterViewInit {
           },
           onEachFeature: (feature, layer) => {
             let properties = feature.properties;
-            layer.bindTooltip(`${properties.fid}`);
+            // layer.bindTooltip(`${properties.fid}`);
             layer.on({
               mouseover: (event: LeafletMouseEvent) =>
                 this.highlightFeature(event),
               mouseout: (event: LeafletMouseEvent) => this.resetFeature(event),
               click: (event: LeafletMouseEvent) => {
-                console.log(properties.color);
+                this.selectBlock = properties.fid;
               },
             });
           },
@@ -139,15 +142,16 @@ export class MapComponent implements OnInit, AfterViewInit {
   }
 
   showMatrix(matrix: string) {
-    console.log(matrix);
     let key: string;
     let unit: string;
     let color: string;
+    let decimal: number;
     switch (matrix) {
       case 'Weight': {
         key = 'weight';
         unit = 'gram(s)';
         color = '#000000';
+        decimal = 2;
         break;
       }
 
@@ -155,6 +159,7 @@ export class MapComponent implements OnInit, AfterViewInit {
         key = 'co2';
         unit = 'gram(s)';
         color = '#ff0000';
+        decimal = 2;
         break;
       }
 
@@ -162,6 +167,7 @@ export class MapComponent implements OnInit, AfterViewInit {
         key = 'methane';
         unit = 'gram(s)';
         color = '#00ff00';
+        decimal = 2;
         break;
       }
 
@@ -169,6 +175,7 @@ export class MapComponent implements OnInit, AfterViewInit {
         key = 'contribution';
         unit = 'time(s)';
         color = '#0000ff';
+        decimal = 0;
         break;
       }
     }
@@ -178,9 +185,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.shapeData.features.forEach((element) => {
       values.push(element.properties?.[key]);
     });
-    console.log(values);
     let max = Math.max(...values);
-    console.log(max);
     this.shape = geoJson(this.shapeData.features, {
       style: (feature) => {
         return {
@@ -191,10 +196,14 @@ export class MapComponent implements OnInit, AfterViewInit {
         };
       },
       onEachFeature: (feature, layer) => {
-        layer.bindTooltip(`${feature.properties?.[key]} ${unit}`);
+        let value: number = feature.properties?.[key];
+        layer.bindTooltip(`${value.toFixed(decimal)} ${unit}`);
         layer.on({
           mouseover: (event: LeafletMouseEvent) => this.highlightFeature(event),
           mouseout: (event: LeafletMouseEvent) => this.resetFeature(event),
+          click: (event: LeafletMouseEvent) => {
+            this.selectBlock = feature.properties.fid;
+          },
         });
       },
     }).addTo(this.map);
