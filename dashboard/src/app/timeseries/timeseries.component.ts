@@ -27,7 +27,11 @@ export class TimeseriesComponent {
   ngOnInit() {
     this.initializeChart();
     this._http
-      .get<LogInterface[]>(`http://192.168.0.101:8000/log_entries/`)
+      .get<LogInterface[]>(`http://192.168.0.101:8000/log_entries/`, {
+        params: {
+          limit: 100000,
+        },
+      })
       .subscribe((data) => {
         this.logs = data;
       });
@@ -119,6 +123,7 @@ export class TimeseriesComponent {
           axisLabel: { formatter: `{value} ${axisLabel!}` },
         },
         series: {
+          name: this.matrix,
           data: this.data,
           markPoint: {
             label: {
@@ -126,6 +131,11 @@ export class TimeseriesComponent {
                 return `${(param.value as number).toFixed(decimal)}`;
               },
             },
+          },
+        },
+        tooltip: {
+          valueFormatter: (value) => {
+            return `${(value as number).toFixed(decimal)} ${axisLabel}`;
           },
         },
       };
@@ -166,7 +176,6 @@ export class TimeseriesComponent {
       yAxis: { type: 'value' },
       series: [
         {
-          name: 'Rainfall',
           type: 'bar',
           data: this.data,
           markPoint: {
