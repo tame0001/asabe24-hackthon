@@ -85,14 +85,14 @@ export class TimeseriesComponent {
         case 'CO2': {
           key = 'co2';
           decimal = 2;
-          axisLabel = 'grams';
+          axisLabel = 'kg';
           break;
         }
 
         case 'Methane': {
           key = 'methane';
           decimal = 2;
-          axisLabel = 'grams';
+          axisLabel = 'm3';
           break;
         }
 

@@ -149,7 +149,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     switch (matrix) {
       case 'Weight': {
         key = 'weight';
-        unit = 'gram(s)';
+        unit = 'grams';
         color = '#000000';
         decimal = 2;
         break;
@@ -157,7 +157,7 @@ export class MapComponent implements OnInit, AfterViewInit {
 
       case 'CO2': {
         key = 'co2';
-        unit = 'gram(s)';
+        unit = 'kg';
         color = '#ff0000';
         decimal = 2;
         break;
@@ -165,7 +165,7 @@ export class MapComponent implements OnInit, AfterViewInit {
 
       case 'Methane': {
         key = 'methane';
-        unit = 'gram(s)';
+        unit = 'm3';
         color = '#00ff00';
         decimal = 2;
         break;
@@ -173,7 +173,7 @@ export class MapComponent implements OnInit, AfterViewInit {
 
       case 'Contribution': {
         key = 'contribution';
-        unit = 'time(s)';
+        unit = 'times';
         color = '#0000ff';
         decimal = 0;
         break;
