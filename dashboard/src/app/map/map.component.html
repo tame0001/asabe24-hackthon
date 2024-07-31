@@ -4,8 +4,20 @@
     <div id="map"></div>
   </div>
 
-  <div class="basis-1/12">
-    <h1>Map</h1>
-    dsafdsaf
+  <div class="basis-full h-20">
+    <label>Pick matrix to be displayed on the map</label>
+    <mat-radio-group
+      aria-labelledby="example-radio-group-label"
+      class="example-radio-group"
+    >
+      @for (matrix of matrices; track matrix) {
+      <mat-radio-button
+        class="example-radio-button"
+        [value]="matrix"
+        (change)="showMatrix(matrix)"
+        >{{ matrix }}</mat-radio-button
+      >
+      }
+    </mat-radio-group>
   </div>
 </div>
